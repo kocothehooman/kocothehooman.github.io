@@ -60,26 +60,30 @@ function centeredText(cx,sy,fs,text,bsy,mxX,margX,color){
                   break;
               }
           }
-      context.font =  fs/(temp/2) + "px Intro"
+     context.font =  fs/(temp/2) + "px Intro"
       let str = text.slice(0,ind)
       let str2 = text.slice(ind)//vzima vtorata polovina
-      let metrR = context.measureText("тест")
-      let actH = metrR.actualBoundingBoxAscent +  metrR.actualBoundingBoxDescent
-      let margY = actH/0.90
-      calcmarg = (bsy-(actH*2+margY))/2
+      
       let metr = context.measureText(str)
       let wid = metr.width
       let metr2 = context.measureText(str2)
       let wid2 = metr2.width
-
-      if(wid > mxX | wid2 > mxX){
-              temp /= 0.85
+          let temp2 = 1
+      if(wid > (mxX-margX*2) ){
+        temp2 = (wid/(mxX-margX*2))
+      }else if( wid2 > (mxX-margX*2)){
+        temp2 = (wid2/(mxX-margX*2))
       }
-      context.font =  fs/(temp/2) + "px Intro"
+      context.font =  fs/(temp/2)/temp2 + "px Intro"
           metr = context.measureText(str)
           metr2 = context.measureText(str2)
           wid = metr.width
           wid2 = metr2.width
+          let metrR = context.measureText("тест")
+          let actH = metrR.actualBoundingBoxAscent +  metrR.actualBoundingBoxDescent
+        let margY = actH/0.90
+        calcmarg = (bsy-(actH*2+margY))/2
+
           
           context.fillText(str,cx + mxX/2 - wid/2,sy + bsy- actH - margY  - calcmarg)
           context.fillText(str2,cx + mxX/2 - wid2/2,sy + bsy - calcmarg)
