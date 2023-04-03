@@ -60,7 +60,7 @@ function centeredText(cx,sy,fs,text,bsy,mxX,margX,color){
                   break;
               }
           }
-     context.font =  fs/(temp/2) + "px Intro"
+      context.font =  fs/(temp/2) + "px Intro"
       let str = text.slice(0,ind)
       let str2 = text.slice(ind)//vzima vtorata polovina
       
@@ -68,7 +68,7 @@ function centeredText(cx,sy,fs,text,bsy,mxX,margX,color){
       let wid = metr.width
       let metr2 = context.measureText(str2)
       let wid2 = metr2.width
-          let temp2 = 1
+      let temp2 = 1
       if(wid > (mxX-margX*2) ){
         temp2 = (wid/(mxX-margX*2))
       }else if( wid2 > (mxX-margX*2)){
@@ -84,7 +84,7 @@ function centeredText(cx,sy,fs,text,bsy,mxX,margX,color){
         let margY = actH/0.90
         calcmarg = (bsy-(actH*2+margY))/2
 
-          
+
           context.fillText(str,cx + mxX/2 - wid/2,sy + bsy- actH - margY  - calcmarg)
           context.fillText(str2,cx + mxX/2 - wid2/2,sy + bsy - calcmarg)
       }else{

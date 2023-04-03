@@ -260,7 +260,7 @@ function draw() {
       rewardArc(286/offs + i*150/offs,248/offs,fill)
     }
     if(hints[1] == 1){
-    //  drawImage(pub,286,168)
+      drawImage(pub,606,165)
     }
     hintArc(137/offs,390/offs,uneedafifth,hints[0]);
     hintArc(137/offs,540/offs,audience,hints[1]);
