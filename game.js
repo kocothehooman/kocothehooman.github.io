@@ -1,4 +1,5 @@
 // Creating variables
+var pub = tryToLoad("publika-bcg","blue")
 var win = tryToLoad("win","blue"),won = false
 var lost = tryToLoad("lost","red")
 var logo = tryToLoad("logo","red")
@@ -8,7 +9,8 @@ var uneedafifth = tryToLoad("5050","white")
 var hinte = tryToLoad("podskazka","white")
 var audience = tryToLoad("publika","white")
 var st = [0,0,0,0]
-var value = ["00.01",
+var value = ["00.00",
+"00.01",
 "00.05",
 "00.10",
 "00.20",
@@ -19,7 +21,7 @@ var value = ["00.01",
 "07.00",
 "10.00"]
 var questions = [
-new question("Къде избухва пеждевременно Априлското въстание?","Сливен","Пазарджик","Пловдив","Копривщица"),
+new question("Къде избухва преждевременно Априлското въстание?","Сливен","Пазарджик","Пловдив","Копривщица"),
 new question("В кой български музей се съхранява Самарското знаме?","Национален исторически музей","Национален археологически музей","Национален природонаучен музей","Национален военноисторически музей"),
 new question("На кой връх, четата на Христо Ботев води тежко сражение срещу превъзхождащата я османска армия?","Бузлуджа","Шипка","Ботев","Вола"),
 new question("Как е наречена къщата, която служи за централа на Гюргевския революционен комитет?"," Парадайс мол","Мелницата","Бункера","Казармата"),
@@ -257,6 +259,9 @@ function draw() {
       }
       rewardArc(286/offs + i*150/offs,248/offs,fill)
     }
+    if(hints[1] == 1){
+      drawImage(pub,286,168)
+    }
     hintArc(137/offs,390/offs,uneedafifth,hints[0]);
     hintArc(137/offs,540/offs,audience,hints[1]);
     hintArc(137/offs,690/offs,hinte,hints[2]);
@@ -446,7 +451,7 @@ function mouseup() {
         lose()
         }
         st[currQuest.idx] = 2;
-        countdown = 100
+        countdown = 250
         }
       }
     }
