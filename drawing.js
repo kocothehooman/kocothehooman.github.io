@@ -1,5 +1,8 @@
 var patterndot = new Image();
 patterndot.src = "images/dot3.png"
+var audiencebcg = new Image();
+audiencebcg.src = "images/publika-bcg-noborder.png"
+
 function background(bcg){
     drawImage(bcg,0,0,1920/offs,1080/offs)//canvas.width,canvas.height)
 }
@@ -256,7 +259,41 @@ function hintArc(x,y,photo,sts){
     drawImage(photo,x-calc,y-calc,125/offs,125/offs)
 }
 
+function AudienceArc(){
+    let radius = 87/offs
+    let x = 952/offs
+    let y = 182/offs
+    let gradi = context.createLinearGradient(x-radius,y - radius,x-radius,y + radius)
+    gradi.addColorStop(0,'#2d1192')
+    gradi.addColorStop(1,'#1f0857')
+    context.fillStyle = gradi
+    context.lineWidth = 12/offs
+    drawCircle(x,y,radius,false)
+    drawCircle(x,y,radius,true)
+    drawImage(audience,858/offs,89/offs,188/offs,188/offs)
+}
 
-function gameover(){
+function AudienceElements(sv){
+    context.fillStyle = "white"
+    context.font = "80px Intro"
+    let y;
+    if(sv){
+     y = 635/offs
+}else{
+     y = 735/offs
+}
+    context.fillRect(710/offs,y,500/offs,15/offs)
+    context.fillText("A",740/offs,y + 100/offs)
+    context.fillText("B",870/offs,y + 100/offs)
+    context.fillText("C",1000/offs,y + 100/offs)
+    context.fillText("D",1130/offs,y + 100/offs)
+}
 
+function FinalAnswer(id){
+    st[id] = 1
+    if(currLevel > 4){
+        stopAudio(backgroundSound[currSound])
+        currSound = 4
+        backgroundSound[currSound].play();
+      }
 }

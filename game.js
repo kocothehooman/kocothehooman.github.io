@@ -34,7 +34,6 @@ new question("Кое българско селище става за кратк�
 ]
 var currLevel = localStorage.getItem("currLvl"),countdown = -1,ans = 0;
 var isInAnim = false,isTrigg = false,isOnStart = (localStorage.getItem("strt") === 'true')
-var meti = []
 var hints = [localStorage.getItem("hint1"),localStorage.getItem("hint2"),localStorage.getItem("hint3")]
 if(localStorage.getItem("currLvl") == null){
   currLevel = 0
@@ -56,7 +55,14 @@ if(localStorage.getItem("hint3") == null){
   hints[2] = 0
   localStorage.setItem("hint3",0)
 }
-var currQuest = questions[currLevel];
+
+var meti = []
+
+var sando = [0,0,0,0],isAudience = false,AudienceTime = -1
+var sandoDir = [];
+for(let i = 0;i<4;i++){
+ sandoDir[i] = parseFloat(0.015)
+}
 //meti - 50/50, meti[] - koi otgovori mahame
 //sando - publika
 //fehti - hintove
@@ -69,6 +75,11 @@ var currQuest = questions[currLevel];
 //[1] - publika
 //[2] - zvunni na uchitel
 
+
+var srvr = false;
+//false - versiq bez kod za vruzka i pollvane na otgovori
+//true - vruzka s node
+var currQuest = questions[currLevel];
 var offs = 1//1.40625
 
 
@@ -99,7 +110,8 @@ var Sy = 483/offs
 //ans == 3 - lost
 
 
-var backgroundSound = [aS("intro.ogg"),aS("Q1-5_(Strachans)_-_Music.ogg"),aS("Q6_(Strachans)_-_Music.ogg"),aS("Millionaire_Closing.ogg"),aS("Q6-11_-_Final_Answer.ogg")]//aS funkciq v drawing
+var backgroundSound = [aS("intro.ogg"),aS("Q1-5_(Strachans)_-_Music.ogg"),aS("Q6_(Strachans)_-_Music.ogg"),aS("Millionaire_Closing.ogg"),aS("Q6-11_-_Final_Answer.ogg"),aS("Ask_the_Audience_Progress.ogg")]
+var resultsSound = aS("Ask_the_Audience_Result.ogg")//aS funkciq v drawing
 var correctAnsSound1 = aS("Q1-4_-_Yes.ogg")
 var correctAnsSound2 = aS("Q6_-_Yes.ogg")
 var WaitAnsSound = aS("Q6-11_-_Final_Answer.ogg")
@@ -107,6 +119,18 @@ var wrongSound1 = aS("Q1-5_-_wrong.ogg")
 var wrongSound2 = aS("Q6-1_-_wrong.ogg")
 var currSound = 0
 
+
+function calcHeight(inds){
+  let y;
+  if(srvr){
+    y = 635/offs
+}else{
+    y = 735/offs
+}
+let y1 =  340/offs
+let temp = y - y1
+return temp*sando[inds]
+}
 
 
 
@@ -140,8 +164,75 @@ function lose(){
 
 function update() {
   if(currSound != 0 && currSound != 3){
-  if(backgroundSound[currSound].paused){
+  if(backgroundSound[currSound].paused && hints[1] != 1){
     backgroundSound[currSound].play();
+  }
+}
+if(isAudience){
+  if(AudienceTime > 0){
+    AudienceTime --
+    for(let i = 0;i<4;i++){
+      if(sando[i] > 0.99 || sando[i] <= 0){
+        sandoDir[i] *= -1 
+    }
+    sando[i] += sandoDir[i]
+    }
+  }else{
+    isAudience = false
+    let curr = currQuest.idx
+    if(!srvr){
+      if(hints[0] != 1){
+      let remain = 1
+      for(let i = 0;i<3;i++){
+        let rnd = Math.random()*remain
+        remain -= rnd
+        sando[i] = rnd
+      }
+      sando[3] = remain
+      let max = 0
+      for(let i = 1;i<4;i++){
+        if(sando[max] < sando[i]){
+          max = i
+        }
+      }
+      let temp = sando[curr]
+      sando[curr] = sando[max]
+      sando[max] = temp
+    }else{
+      let ans2;
+      for(let i = 0;i<4;i++){
+        if(curr != i){
+        if(meti[0] != i && meti[1] != i){
+            ans2 = i
+         }
+         sando[i] = 0
+        }
+      }
+      let rnd = Math.random()
+      if(rnd >= 0.5){
+        sando[curr] = rnd
+        sando[ans2] = 1 - rnd
+      }else{
+        sando[ans] = rnd
+        sando[curr] = 1 - rnd
+      }
+    }
+    }
+    AudienceTime = 500
+    stopAudio(backgroundSound[5])
+    resultsSound.volume = 0.5
+    resultsSound.play()
+    console.log(curr)
+  }
+}else if(AudienceTime >= 0){
+  if(AudienceTime == 0){
+    hints[1] = 2
+    localStorage.setItem("hint2",2)
+    //FinalAnswer(currQuest.idx)
+    AudienceTime = -1
+    backgroundSound[currSound].play()
+  }else{
+    AudienceTime--
   }
 }
 if(countdown >= 0){
@@ -171,7 +262,6 @@ if(countdown == 0){
       clearCh(5);
       localStorage.setItem("currLvl", currLevel)
       currQuest = questions[currLevel]
-      //currQuest = questions[1]
       for(let i = 0;i<3;i++){
         if(hints[i] == 1){
           hints[i] = 2
@@ -207,7 +297,6 @@ if(countdown == 0){
     }
   }
 }
-
 
 
 
@@ -259,9 +348,7 @@ function draw() {
       }
       rewardArc(286/offs + i*150/offs,248/offs,fill)
     }
-    if(hints[1] == 1){
-      //drawImage(pub,606,165)
-    }
+    
     hintArc(137/offs,390/offs,uneedafifth,hints[0]);
     hintArc(137/offs,540/offs,audience,hints[1]);
     hintArc(137/offs,690/offs,hinte,hints[2]);
@@ -269,6 +356,20 @@ function draw() {
 
 // 62 - radius
     stoinosti();
+    if(hints[1] == 1){
+      drawImage(pub,606,165)
+      AudienceArc()
+      AudienceElements(srvr)
+      let y;
+      if(srvr){
+        y = 595/offs
+   }else{
+        y = 695/offs
+   }
+      for(let i = 0;i<4;i++){
+        context.fillRect(710/offs + (130/offs)*i,y,100/offs,-calcHeight(i))
+      }
+    }
   }
 }else if(won){
   drawImage(win,0,0,1920/offs,1080/offs)
@@ -330,18 +431,12 @@ function mouseup() {
   }
   }else if(!won){
     if(ans != 2 && ans != 3){
-  if(countdown < 0){
+  if(countdown < 0 && hints[1] != 1){
     if(meti[0] != 0 && meti[1] != 0){
     if(areColliding(tx1,ty1,tsx,tsy,mouseX,mouseY,1,1)){
       clearCh(0);
       if(st[0] == 0 || st[0] == 2){
-        st[0] = 1 
-        if(currLevel > 4){
-          stopAudio(backgroundSound[currSound])
-          currSound = 4
-          backgroundSound[currSound].play();
-          //WaitAnsSound.play();
-        }
+        FinalAnswer(0)
       }else {
         if(currQuest.idx == 0){
           if(currLevel < 4){
@@ -366,13 +461,7 @@ function mouseup() {
     if(areColliding(tx2,ty1,tsx,tsy,mouseX,mouseY,1,1)){
       clearCh(1);
       if(st[1] == 0 || st[1] == 2){
-        st[1] = 1
-        if(currLevel > 4){
-          stopAudio(backgroundSound[currSound])
-          currSound = 4
-          backgroundSound[currSound].play();
-          //WaitAnsSound.play();
-        }
+        FinalAnswer(1)
       }else {
         if(currQuest.idx == 1){
           if(currLevel < 4){
@@ -397,13 +486,7 @@ function mouseup() {
     if(areColliding(tx1,ty2,tsx,tsy,mouseX,mouseY,1,1)){
       clearCh(2);
       if(st[2] == 0 || st[2] == 2){
-        st[2] = 1
-        if(currLevel > 4){
-          stopAudio(backgroundSound[currSound])
-          currSound = 4
-          backgroundSound[currSound].play();
-          //WaitAnsSound.play();
-        }
+        FinalAnswer(2)
       }else {
         if(currQuest.idx == 2){
           if(currLevel < 4){
@@ -428,13 +511,7 @@ function mouseup() {
     if(areColliding(tx2,ty2,tsx,tsy,mouseX,mouseY,1,1)){
       clearCh(3);
       if(st[3] == 0 || st[3] == 2){
-        st[3] = 1 
-        if(currLevel > 4){
-          stopAudio(backgroundSound[currSound])
-          currSound = 4
-          backgroundSound[currSound].play();
-          //WaitAnsSound.play();
-        }
+        FinalAnswer(3)
       }else {
         if(currQuest.idx == 3){
           if(currLevel < 4){
